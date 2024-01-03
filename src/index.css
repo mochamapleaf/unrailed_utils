@@ -1,0 +1,98 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.terrain_selector_container{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    background-color: rgba(0,0,0,0.05);
+}
+
+.terrain_selection{
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
+    margin: 10px;
+    position: relative;
+}
+.terrain_selection_overlay{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.3;
+}
+.selected_overlay{
+    background-color: aquamarine;
+}
+
+.forbidden_overlay{
+    background-color: coral;
+}
+
+.terrain_selection_overlay:hover{
+    opacity: 0.5;
+}
+
+.terrain_selection img{
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: cover;
+}
+
+.wagon_selector_container{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    background-color: rgba(0,0,0,0.05);
+}
+
+.wagon_selection{
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
+    margin: 10px;
+    position: relative;
+    background: rgba(0,0,0,0.7);
+    justify-content: center;
+    transition: 0.3s;
+}
+.wagon_selection_overlay{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.0;
+    background-color: gray;
+    z-index: 2;
+}
+
+.wagon_selection_overlay:hover{
+    opacity: 0.3;
+}
+
+.wagon_selection img{
+    max-height: 90%;
+    max-width: 90%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+
+.hide_wagon_cnt{
+    display: none;
+}
+
+.show_wagon_cnt{
+    display: block;
+}
