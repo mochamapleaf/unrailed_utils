@@ -1,3 +1,8 @@
+mod unrailed_rng;
+mod unrailed_seed;
+mod unrailed_defs;
+mod rand_selector;
+
 extern crate core;
 
 use core::fmt;
@@ -5,175 +10,27 @@ use wasm_bindgen::prelude::*;
 use web_sys::{HtmlInputElement, HtmlElement};
 use base64::{engine, Engine};
 use error_stack::{Context, Report, Result, ResultExt};
-use lazy_static::lazy_static;
 
+use crate::unrailed_rng::UnrailedRng;
+use crate::unrailed_defs::*;
+use crate::unrailed_seed::UnrailedSeed;
+use crate::rand_selector::RandSelector;
 
-enum TerrainType{
-    Plain,
-    Dessart,
-    Snow,
-    Hell,
-    aSg,
-    aSH,
-    Mars,
-    aSI
-}
-
-enum WagonType{
-    GhostWagon,
-    SuperChargerWagon,
-    TrackWagon,
-    LightWagon,
-    ConvertingWagon,
-    CollectorWagon,
-    StorageWagon,
-    DynamiteWagon,
-    MiningWagon,
-    BucketWagon,
-    MilkWagon,
-}
-
-pub struct UnrailedRng{
-    pub state1: u64,
-    pub state2: u64,
-}
-
-impl UnrailedRng{
-    pub fn new(val1: u64, val2: u64) -> Self{
-        let mut ret = Self{
-            state1: 0,
-            state2: 0,
-        };
-        ret.state2 = (val2 << 1) | 0b1;
-        ret.update_state();
-        ret.state1 = ret.state1.wrapping_add(val1);
-        ret.update_state();
-        ret
-    }
-    pub fn from_states(state1: u64, state2: u64) -> Self{
-        Self{
-            state1,
-            state2,
-        }
-    }
-    pub fn from_seed_str(seed: &str) -> Self {
-        todo!();
-    }
-    fn update_state(&mut self){
-        self.state1 = self.state1.wrapping_mul(6364136223846793005);
-        self.state1 = self.state1.wrapping_add(self.state2);
-    }
-
-    pub fn next_u32(&mut self) -> u32{
-        let mut ret: u64 = self.state1;
-        self.update_state();
-        let tmp1: u32 = ( (ret >> 18 ^ ret) >> 27 ) as u32;
-        let tmp2 = ret >> 59;
-        let neg_tmp2 =  (!tmp2).wrapping_add(1);
-        return (tmp1 >> (tmp2 % 32)) | tmp1 << ( neg_tmp2 % 32);
-    }
-
-    pub fn gen_range(&mut self, range: core::ops::Range<u32>) -> u32{
-        if range.start >= range.end { return range.start; }
-        let range_size = range.end - range.start;
-        let neg_range_size = (!range_size).wrapping_add(1);
-        let threshold = neg_range_size % range_size;
-        let mut ret = self.next_u32();
-        while ret < threshold {  ret = self.next_u32();  }
-        (ret % range_size) + range.start
-    }
-
-    pub fn gen_f64(&mut self)-> f64{ self.gen_range(0..1000000) as f64 / 1000000.0 }
-
-    pub fn gen_bool(&mut self) -> bool{ self.gen_range(0..2) == 1 }
-
-    pub fn gen_prob(&mut self) -> f32{
-        let val = self.next_u32();
-        let denominator = f32::from_bits( (127 << 23) | (0x7FFFFF) );
-        let numerator = f32::from_bits( (127 << 23) | (0x7FFFFF & val) );
-        let tmp = (numerator / denominator).to_bits() - 1;
-        return 2.0 * (f32::from_bits(tmp) - 0.5);
-    }
-}
-
-
-
-
-#[derive(Debug, PartialEq)]
-pub enum UnrailedGameDifficulty{
-    Easy = 0,
-    Medium = 1,
-    Hard = 2,
-    Extreme = 3,
-    Kids = 4,
-}
-
-#[derive(Debug, PartialEq)]
-pub enum UnrailedGameMode{
-    Time,
-    Versus,
-    Sandbox,
-    Endless,
-    Quick,
-}
-
-pub struct UnrailedSeed{
-    pub val: u32,
-    pub difficulty: UnrailedGameDifficulty,
-    pub mode: UnrailedGameMode,
-}
-
-#[derive(Debug)]
-pub struct InvalidArgumentError;
-
-impl fmt::Display for InvalidArgumentError{
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result{
-        f.write_str("invalid argument")
-    }
-}
-impl Context for InvalidArgumentError {}
-
-lazy_static!{
-    static ref BASE64_ENGINE: base64::engine::GeneralPurpose = base64::engine::GeneralPurpose::new(
-        &base64::alphabet::Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-")
-            .expect("invalid alphabet"),
-        base64::engine::GeneralPurposeConfig::new()
-            .with_decode_allow_trailing_bits(true)
-            .with_decode_padding_mode(base64::engine::DecodePaddingMode::Indifferent)
-            .with_encode_padding(true)
-    );
-}
-
-impl UnrailedSeed{
-
-    pub fn from_str(seed: &str) -> Result<Self, InvalidArgumentError>{
-        //base64 decode
-        let decoded = BASE64_ENGINE.decode(seed.as_bytes())
-            .change_context(InvalidArgumentError)?;
-        let val = u32::from_le_bytes(decoded[0..4].try_into().unwrap());
-        let difficulty = match (decoded[4] >> 5){
-            0 => UnrailedGameDifficulty::Easy,
-            1 => UnrailedGameDifficulty::Medium,
-            2 => UnrailedGameDifficulty::Hard,
-            3 => UnrailedGameDifficulty::Extreme,
-            4 => UnrailedGameDifficulty::Kids,
-            _ => return Err(Report::new(InvalidArgumentError).into()),
-        };
-        let mode = UnrailedGameMode::Time;
-        Ok(Self{ val, difficulty, mode})
-    }
-}
-struct RandSelector<T>{
-    pool: Vec<T>,
-    prob: Vec<f32>,
+struct TerrainGenerator{
     rng: UnrailedRng,
+    terrain_pool: RandSelector<TerrainType>,
 }
 
-impl<T> RandSelector<T> {
-    fn add(&mut self, item: T) -> &Self{
-        self.pool.push(item);
-        self.prob.push(1.0);
-        self
+impl TerrainGenerator{
+    const TERRAIN_RNG_OFFSET: u64 = 123;
+    fn new(seed: UnrailedSeed) -> Self{
+        let rng = UnrailedRng::new(seed.val as u64, );
+    }
+}
+impl Iterator for TerrainGenerator{
+    type Item = TerrainType;
+    fn next(&mut self) -> Option<Self::Item>{
+        todo!()
     }
 }
 
