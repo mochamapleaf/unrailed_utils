@@ -5,7 +5,7 @@ use wasm_bindgen::prelude::*;
 use web_sys::{HtmlInputElement, HtmlElement};
 use base64::{engine, Engine};
 use error_stack::{Context, Report, Result, ResultExt};
-use lazy_static;
+use lazy_static::lazy_static;
 
 
 enum TerrainType{
@@ -99,7 +99,8 @@ impl UnrailedRng{
 
 
 
-enum UnrailedGameDifficulty{
+#[derive(Debug, PartialEq)]
+pub enum UnrailedGameDifficulty{
     Easy = 0,
     Medium = 1,
     Hard = 2,
@@ -107,7 +108,8 @@ enum UnrailedGameDifficulty{
     Kids = 4,
 }
 
-enum UnrailedGameMode{
+#[derive(Debug, PartialEq)]
+pub enum UnrailedGameMode{
     Time,
     Versus,
     Sandbox,
@@ -115,14 +117,14 @@ enum UnrailedGameMode{
     Quick,
 }
 
-struct UnrailedSeed{
+pub struct UnrailedSeed{
     pub val: u32,
     pub difficulty: UnrailedGameDifficulty,
     pub mode: UnrailedGameMode,
 }
 
 #[derive(Debug)]
-struct InvalidArgumentError;
+pub struct InvalidArgumentError;
 
 impl fmt::Display for InvalidArgumentError{
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result{
@@ -131,17 +133,20 @@ impl fmt::Display for InvalidArgumentError{
 }
 impl Context for InvalidArgumentError {}
 
+lazy_static!{
+    static ref BASE64_ENGINE: base64::engine::GeneralPurpose = base64::engine::GeneralPurpose::new(
+        &base64::alphabet::Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-")
+            .expect("invalid alphabet"),
+        base64::engine::GeneralPurposeConfig::new()
+            .with_decode_allow_trailing_bits(true)
+            .with_decode_padding_mode(base64::engine::DecodePaddingMode::Indifferent)
+            .with_encode_padding(true)
+    );
+}
+
 impl UnrailedSeed{
 
-    fn from_str(seed: &str) -> Result<Self, InvalidArgumentError>{
-        let BASE64_ENGINE: base64::engine::GeneralPurpose = base64::engine::GeneralPurpose::new(
-            &base64::alphabet::Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-")
-                .expect("invalid alphabet"),
-            base64::engine::GeneralPurposeConfig::new()
-                .with_decode_allow_trailing_bits(true)
-                .with_decode_padding_mode(base64::engine::DecodePaddingMode::Indifferent)
-                .with_encode_padding(true)
-        );
+    pub fn from_str(seed: &str) -> Result<Self, InvalidArgumentError>{
         //base64 decode
         let decoded = BASE64_ENGINE.decode(seed.as_bytes())
             .change_context(InvalidArgumentError)?;
