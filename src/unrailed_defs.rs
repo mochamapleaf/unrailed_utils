@@ -14,6 +14,7 @@ pub enum TerrainType{
     aSI = 8
 }
 
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum WagonType{
     TrackWagon = 0,
     GhostWagon,
@@ -26,6 +27,7 @@ pub enum WagonType{
     MiningWagon,
     BucketWagon,
     MilkWagon,
+    CompassWagon,
 }
 
 #[derive(Debug, PartialEq)]

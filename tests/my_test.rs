@@ -8,6 +8,8 @@ use unrailed_utils::unrailed_defs::*;
 use unrailed_utils::unrailed_rng::*;
 use unrailed_utils::unrailed_seed::*;
 use unrailed_utils::rand_selector::*;
+use unrailed_utils::terrain_generator::*;
+use unrailed_utils::wagon_generator::*;
 use unrailed_utils::*;
 
 #[wasm_bindgen_test]
@@ -49,10 +51,22 @@ fn test_seed_decoding(){
 fn test_terrain_generator(){
     let seed = UnrailedSeed::from_str("+pbHigU")
         .expect("Failed to decode seed");
-    let mut terrain_generator = TerrainGenerator::new(seed);
+    let mut terrain_generator = TerrainGenerator::new(&seed);
     assert_eq!(terrain_generator.next(), Some(TerrainType::Plain));
     assert_eq!(terrain_generator.next(), Some(TerrainType::Plain));
     assert_eq!(terrain_generator.next(), Some(TerrainType::Plain));
     assert_eq!(terrain_generator.next(), Some(TerrainType::Dessart));
-    assert_eq!(terrain_generator.skip(20).next(), Some(TerrainType::Dessart));
+    assert_eq!(terrain_generator.skip(16).next(), Some(TerrainType::Dessart));
+}
+
+#[wasm_bindgen_test]
+fn test_wagon_generator(){
+    let seed = UnrailedSeed::from_str("+pbHigU")
+        .expect("Failed to decode seed");
+    let mut wagon_generator = WagonGenerator::new(&seed);
+    assert_eq!(wagon_generator.next(), Some(WagonType::DynamiteWagon));
+    assert_eq!(wagon_generator.next(), Some(WagonType::MiningWagon));
+    assert_eq!(wagon_generator.next(), Some(WagonType::TrackWagon));
+    assert_eq!(wagon_generator.next(), Some(WagonType::SuperChargerWagon));
+    assert_eq!(wagon_generator.next(), Some(WagonType::SuperChargerWagon));
 }

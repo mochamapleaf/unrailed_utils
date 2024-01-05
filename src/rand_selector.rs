@@ -2,7 +2,7 @@ use crate::unrailed_rng::UnrailedRng;
 
 pub struct RandSelector<T> where
     T: PartialEq + Clone{
-    pool: Vec<T>,
+    pub pool: Vec<T>,
     weight: Vec<f32>,
 }
 
@@ -25,7 +25,8 @@ impl<T> RandSelector<T> where
     pub(crate) fn select(&self, prob: f32) -> &T{
         //generate lookup list
         let total_weight = self.weight.iter().sum::<f32>();
-        let prob_lookup = self.weight.iter().map(|x| x / total_weight).collect::<Vec<f32>>();
+        let mut acc = 0_f32;
+        let prob_lookup = self.weight.iter().map( |x| {acc +=  x / total_weight; acc} ).collect::<Vec<f32>>();
         let selected = prob_lookup.iter().position(|x| prob < *x).unwrap_or(self.weight.len() -1);
         &self.pool[selected]
     }
