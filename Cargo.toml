@@ -1,10 +1,12 @@
 [package]
-name = "unrailed_seed_analyzer"
+name = "unrailed_utils"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
+name = "unrailed_utils"
+path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
 
 

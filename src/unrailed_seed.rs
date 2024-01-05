@@ -1,5 +1,6 @@
 use core::fmt;
-use error_stack::{Context, Report};
+use base64::Engine;
+use error_stack::{Context, Report, ResultExt};
 use lazy_static::lazy_static;
 use crate::unrailed_defs::{UnrailedGameDifficulty, UnrailedGameMode};
 
@@ -34,10 +35,10 @@ impl UnrailedSeed{
 
     pub fn from_str(seed: &str) -> error_stack::Result<Self, InvalidArgumentError> {
         //base64 decode
-        let decoded = crate::BASE64_ENGINE.decode(seed.as_bytes())
+        let decoded = BASE64_ENGINE.decode(seed.as_bytes())
             .change_context(InvalidArgumentError)?;
         let val = u32::from_le_bytes(decoded[0..4].try_into().unwrap());
-        let difficulty = match (decoded[4] >> 5){
+        let difficulty = match decoded[4] >> 5{
             0 => UnrailedGameDifficulty::Easy,
             1 => UnrailedGameDifficulty::Medium,
             2 => UnrailedGameDifficulty::Hard,

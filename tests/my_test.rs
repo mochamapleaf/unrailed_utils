@@ -1,10 +1,15 @@
-#[cfg(test)]
+#![cfg(target_arch = "wasm32")]
 
+extern crate wasm_bindgen_test;
 use wasm_bindgen_test::*;
-
 wasm_bindgen_test_configure!(run_in_browser);
 
-use unrailed_seed_analyzer::UnrailedRng;
+use unrailed_utils::unrailed_defs::*;
+use unrailed_utils::unrailed_rng::*;
+use unrailed_utils::unrailed_seed::*;
+use unrailed_utils::rand_selector::*;
+use unrailed_utils::*;
+
 #[wasm_bindgen_test]
 fn test_unrailed_rng(){
     let mut rng = UnrailedRng::new(0x1234567890ABCDEF, 0xFEDCBA0987654321);
@@ -31,7 +36,6 @@ fn test_unrailed_rng(){
     }
 }
 
-use unrailed_seed_analyzer::{UnrailedSeed, UnrailedGameDifficulty, UnrailedGameMode};
 #[wasm_bindgen_test]
 fn test_seed_decoding(){
     let mut seed = UnrailedSeed::from_str("+pbHigU")
@@ -39,4 +43,16 @@ fn test_seed_decoding(){
     assert_eq!(seed.val, 0x8ac796fa);
     assert_eq!(seed.difficulty, UnrailedGameDifficulty::Easy);
     assert_eq!(seed.mode, UnrailedGameMode::Time);
+}
+
+#[wasm_bindgen_test]
+fn test_terrain_generator(){
+    let seed = UnrailedSeed::from_str("+pbHigU")
+        .expect("Failed to decode seed");
+    let mut terrain_generator = TerrainGenerator::new(seed);
+    assert_eq!(terrain_generator.next(), Some(TerrainType::Plain));
+    assert_eq!(terrain_generator.next(), Some(TerrainType::Plain));
+    assert_eq!(terrain_generator.next(), Some(TerrainType::Plain));
+    assert_eq!(terrain_generator.next(), Some(TerrainType::Dessart));
+    assert_eq!(terrain_generator.skip(20).next(), Some(TerrainType::Dessart));
 }

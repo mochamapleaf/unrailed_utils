@@ -1,4 +1,4 @@
-import init, * as wasm from '../pkg/unrailed_seed_analyzer.js';
+import init, * as wasm from '../pkg/unrailed_utils.js';
 
 async function run() {
   await init();

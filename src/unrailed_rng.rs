@@ -24,7 +24,7 @@ impl UnrailedRng{
     pub fn from_seed_str(seed: &str) -> Self {
         todo!();
     }
-    fn update_state(&mut self){
+    pub fn update_state(&mut self){
         self.state1 = self.state1.wrapping_mul(6364136223846793005);
         self.state1 = self.state1.wrapping_add(self.state2);
     }

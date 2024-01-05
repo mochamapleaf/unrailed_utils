@@ -1,20 +1,23 @@
 
 pub const QUICKMODE_RNG_OFFSET: u64 = 2;
+pub const RNG_BASE: u64 = 1000000;
+#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub enum TerrainType{
-    Plain,
-    Dessart,
-    Snow,
-    Hell,
-    aSg,
-    aSH,
-    Mars,
-    aSI
+    aSE = 0, //debug
+    Plain = 1, //aSe
+    Dessart = 2, //aSF
+    Snow = 3, //aSf
+    Hell = 4, //aSG
+    Space = 5, //aSg
+    aSH = 6,
+    Mars = 7, //aSh
+    aSI = 8
 }
 
 pub enum WagonType{
+    TrackWagon = 0,
     GhostWagon,
     SuperChargerWagon,
-    TrackWagon,
     LightWagon,
     ConvertingWagon,
     CollectorWagon,
