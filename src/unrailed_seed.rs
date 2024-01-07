@@ -33,6 +33,10 @@ lazy_static!{
 
 impl UnrailedSeed{
 
+    pub fn new(val: u32, difficulty: UnrailedGameDifficulty, mode: UnrailedGameMode) -> Self{
+        Self{  val, difficulty, mode, }
+    }
+
     pub fn from_str(seed: &str) -> error_stack::Result<Self, InvalidArgumentError> {
         //base64 decode
         let decoded = BASE64_ENGINE.decode(seed.as_bytes())
@@ -46,7 +50,23 @@ impl UnrailedSeed{
             4 => UnrailedGameDifficulty::Kids,
             _ => return Err(Report::new(InvalidArgumentError).into()),
         };
-        let mode = UnrailedGameMode::Time;
+        let mode = match decoded[4] & 0x1F{
+            5 => UnrailedGameMode::TimeAttack,
+            _ => return Err(Report::new(InvalidArgumentError).into()),
+        };
         Ok(Self{ val, difficulty, mode})
+    }
+}
+
+
+impl ToString for UnrailedSeed{
+    fn to_string(&self) -> String {
+        let mut ret = Vec::new();
+        ret.extend_from_slice(&self.val.to_le_bytes());
+        let tmp = ((self.difficulty as u8) << 5) | self.mode as u8;
+        ret.push(tmp);
+        let mut raw_str = BASE64_ENGINE.encode(&ret);
+        raw_str.pop();
+        raw_str
     }
 }

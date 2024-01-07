@@ -1,6 +1,6 @@
 use unrailed_utils::*;
 use unrailed_utils::terrain_generator::TerrainGenerator;
-use unrailed_utils::unrailed_defs::TerrainType;
+use unrailed_utils::unrailed_defs::{TerrainType, UnrailedGameDifficulty, UnrailedGameMode};
 use unrailed_utils::unrailed_seed::UnrailedSeed;
 use unrailed_utils::wagon_generator::WagonGenerator;
 
@@ -12,7 +12,7 @@ fn test_terrain_generator(){
 }
 
 fn main() {
-    test_wagon_generator();
+    unrailed_utils::find_seed();
 }
 
 fn test_wagon_generator(){

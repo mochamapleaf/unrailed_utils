@@ -44,7 +44,13 @@ fn test_seed_decoding(){
         .expect("Failed to decode seed");
     assert_eq!(seed.val, 0x8ac796fa);
     assert_eq!(seed.difficulty, UnrailedGameDifficulty::Easy);
-    assert_eq!(seed.mode, UnrailedGameMode::Time);
+    assert_eq!(seed.mode, UnrailedGameMode::TimeAttack);
+}
+
+#[wasm_bindgen_test]
+fn test_seed_encoding(){
+    let seed = UnrailedSeed::new(0x8ac796fa, UnrailedGameDifficulty::Easy, UnrailedGameMode::TimeAttack);
+    assert_eq!(seed.to_string(), "+pbHigU");
 }
 
 #[wasm_bindgen_test]
