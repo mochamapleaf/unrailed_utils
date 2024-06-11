@@ -11,11 +11,17 @@ crate-type = ["cdylib", "rlib"]
 
 
 [dependencies]
-wasm-bindgen = "0.2.89"
-web-sys = { version = "0.3.66", features = ["Window", "Document", "HtmlElement", "console", "HtmlInputElement"] }
+#wasm-bindgen = "0.2.89"
+#web-sys = { version = "0.3.66", features = ["Window", "Document", "HtmlElement", "console", "HtmlInputElement"] }
 base64 = "0.21.5"
 error-stack = "0.4.1"
 lazy_static = { version = "1.4.0", features = ["spin_no_std"] }
+wasm-bindgen="0.2"
 
-[dev-dependencies]
-wasm-bindgen-test = "0.3.39"
+clap = { version = "4.5.7", features = ["derive"] }
+serde = {version = "1.0", features = ["derive"]}
+serde_yaml = "0.9.34+deprecated"
+indicatif = "0.17.8"
+
+#[dev-dependencies]
+#wasm-bindgen-test = "0.3.39"

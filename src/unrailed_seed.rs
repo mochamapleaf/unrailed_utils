@@ -2,8 +2,10 @@ use core::fmt;
 use base64::Engine;
 use error_stack::{Context, Report, ResultExt};
 use lazy_static::lazy_static;
+use wasm_bindgen::prelude::wasm_bindgen;
 use crate::unrailed_defs::{UnrailedGameDifficulty, UnrailedGameMode};
 
+#[derive(Copy, Clone)]
 pub struct UnrailedSeed{
     pub val: u32,
     pub difficulty: UnrailedGameDifficulty,

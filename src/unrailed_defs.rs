@@ -1,7 +1,11 @@
+use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 pub const QUICKMODE_RNG_OFFSET: u64 = 2;
 pub const RNG_BASE: u64 = 1000000;
-#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy, Hash)]
+
+#[wasm_bindgen]
+#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy, Hash, Serialize, Deserialize)]
 pub enum TerrainType{
     aSE = 0, //debug
     Plain = 1, //aSe
@@ -14,7 +18,7 @@ pub enum TerrainType{
     aSI = 8
 }
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone, Copy, Serialize, Deserialize)]
 pub enum WagonType{
     TrackWagon = 0, //apG
     DynamiteWagon = 1, //apg
@@ -39,7 +43,7 @@ pub enum WagonType{
     BucketWagon = 20, //apQ
 }
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone, Copy,Serialize, Deserialize)]
 pub enum UnrailedGameDifficulty{
     Easy = 0,
     Medium = 1,

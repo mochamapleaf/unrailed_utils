@@ -1,0 +1,17 @@
+wagon_list:
+  - MiningWagon
+  - MiningWagon
+  - BucketWagon
+  - SuperChargerWagon
+  - CollectorWagon
+  - SuperChargerWagon
+  - LightWagon
+  - CollectorWagon
+
+allowed_terrains:
+  - Plain
+  - Dessart
+  - Snow
+
+difficulty: Medium
+margin: 3
